@@ -1,0 +1,10 @@
+version: '3.4'
+services:
+  substrate-node:
+    image: prosopo/substrate-node:dev
+    ports:
+      - "9615:9615"
+      - "9944:9944"
+      - "9933:9933"
+    volumes:
+      - ./chain-data:/chain-data
