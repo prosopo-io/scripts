@@ -2,7 +2,7 @@
 version: '3.8'
 services:
   substrate:
-    image: prosopo/substrate:demo-v1.0.0
+    image: prosopo/substrate:demo-v1.0.2
     ports:
       - "9615:9615"
       - "9944:9944"
@@ -28,7 +28,7 @@ services:
           cpus: '1'
           memory: 512M
   provider:
-    image: prosopo/provider:1.0.3
+    image: prosopo/provider:v1.0.4
     environment:
       - NODE_ENV=production
       - DAPP_CONTRACT_ADDRESS=5Go2hCf1WHzKqt1HGCUwhKfUS85477HUHgvaKkMJRYBfyiUP
