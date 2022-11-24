@@ -2,7 +2,7 @@
 version: '3.8'
 services:
   substrate:
-    image: prosopo/substrate:demo-v1.0.2
+    image: prosopo/substrate:demo-v1.0.3
     ports:
       - "9615:9615"
       - "9944:9944"
@@ -28,7 +28,7 @@ services:
           cpus: '1'
           memory: 512M
   provider:
-    image: prosopo/provider:v1.0.4
+    image: prosopo/provider:v1.0.5
     environment:
       - NODE_ENV=production
       - DAPP_CONTRACT_ADDRESS=5FwHfbt6ua4GKcbNVwZvvgTwXszp1yj8G3LvK2FtaEtbmAJ9
@@ -42,7 +42,7 @@ services:
       # replicas: 1
       resources:
         limits:
-          cpus: '1'
+          cpus: '0.5'
           memory: 512M
 
 # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/specifying-sensitive-data-secrets.html
