@@ -41,10 +41,11 @@ echo "instantiating contract, please wait..."
 cd ../protocol
 
 docker run --network host --rm -it -v $(pwd)/contracts:/contracts paritytech/contracts-ci-linux:production cargo contract instantiate /contracts/target/ink/prosopo.wasm --args 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY 1000000000000 --constructor default --suri "//Alice" --value 2000000000000 --url ws://localhost:9944 --manifest-path /contracts/Cargo.toml --verbose  --skip-confirm | tee instantiate.log
+sed -i "s,\x1B\[[0-9;]*[a-zA-Z],,g" instantiate.log
 
 # get the contract address and code hash from the instantiate log
-contractAddr=$( cat instantiate.log | grep "Contract" | tail -n 1 | awk '{print $3}')
-codeHash=$( cat instantiate.log | grep "Code hash" | awk '{print $4}')
+contractAddr=$( cat instantiate.log | grep "Contract" | tail -n 1 | awk '{print $2}' )
+codeHash=$( cat instantiate.log | grep "Code hash" | awk '{print $3}')
 
 cd ../scripts 
 
@@ -53,15 +54,22 @@ echo $contractAddr
 echo "Code hash:"
 echo $codeHash
 
-# for each repo needing knowledge of the contract address, update the corresponding .env file with the new address
-echo "updating provider .env.development file"
-sed -i '/^CONTRACT_ADDRESS=/{h;s/=.*/='"$contractAddr"'/};${x;/^$/{s//CONTRACT_ADDRESS='"$contractAddr"'/;H};x}' ../workspaces/packages/provider/.env.development
+# update the .env files with the new contract address
+set +eu
+for file in env .env env.development env.production .env.development .env.production; do
 
-echo "updating client-example .env.development file"
-sed -i '/^REACT_APP_PROSOPO_CONTRACT_ADDRESS=/{h;s/=.*/='"$contractAddr"'/};${x;/^$/{s//REACT_APP_PROSOPO_CONTRACT_ADDRESS='"$contractAddr"'/;H};x}' ../workspaces/demos/client-example/.env.development
+    # for each repo needing knowledge of the contract address, update the corresponding .env file with the new address
+    echo "updating provider .env.development file"
+    sed -i "s/^CONTRACT_ADDRESS=.*/CONTRACT_ADDRESS=$contractAddr/" ../workspaces/packages/provider/$file
 
-echo "updating client-example-server .env.development file"
-sed -i '/^REACT_APP_PROSOPO_CONTRACT_ADDRESS=/{h;s/=.*/='"$contractAddr"'/};${x;/^$/{s//REACT_APP_PROSOPO_CONTRACT_ADDRESS='"$contractAddr"'/;H};x}' ../workspaces/demos/client-example-server/.env.development
+    echo "updating client-example .env.development file"
+    sed -i "s/^REACT_APP_PROSOPO_CONTRACT_ADDRESS=.*/REACT_APP_PROSOPO_CONTRACT_ADDRESS=$contractAddr/" ../workspaces/demos/client-example/$file
 
-echo "updating demo-nft-marketplace .env.development file"
-sed -i '/^NEXT_PUBLIC_PROSOPO_CONTRACT_ADDRESS=/{h;s/=.*/='"$contractAddr"'/};${x;/^$/{s//NEXT_PUBLIC_PROSOPO_CONTRACT_ADDRESS='"$contractAddr"'/;H};x}' ../workspaces/demos/demo-nft-marketplace/.env.development
+    echo "updating client-example-server .env.development file"
+    sed -i "s/^REACT_APP_PROSOPO_CONTRACT_ADDRESS=.*/REACT_APP_PROSOPO_CONTRACT_ADDRESS=$contractAddr/" ../workspaces/demos/client-example-server/$file
+
+    echo "updating demo-nft-marketplace .env.development file"
+    sed -i "s/^NEXT_PUBLIC_PROSOPO_CONTRACT_ADDRESS=.*/NEXT_PUBLIC_PROSOPO_CONTRACT_ADDRESS=$contractAddr/" ../workspaces/demos/demo-nft-marketplace/$file
+
+done
+set -eu
