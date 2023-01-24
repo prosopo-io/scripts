@@ -2,7 +2,7 @@
 version: '3.8'
 services:
   substrate:
-    image: prosopo/substrate:demo-v1.0.3
+    image: prosopo/substrate:demo-v1.0.4
     ports:
       - "9615:9615"
       - "9944:9944"
@@ -28,10 +28,11 @@ services:
           cpus: '1'
           memory: 512M
   provider:
+    # TODO update provider image
     image: prosopo/provider:v1.0.5
     environment:
       - NODE_ENV=production
-      - DAPP_CONTRACT_ADDRESS=5FwHfbt6ua4GKcbNVwZvvgTwXszp1yj8G3LvK2FtaEtbmAJ9
+      - DAPP_CONTRACT_ADDRESS=5GoHpdidCX62uE3wuQagVWhf4Un1gVten4NZ6k72Hd74WYYr
       - DATABASE_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD
     ports:
       - "3000:3000"
