@@ -10,7 +10,7 @@ services:
         ARCHITECTURE: x86_64
         CONTRACT_NAME: prosopo
         CONTRACT_PATH: protocol/contracts
-        CONTRACT_ARGS: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY 1000000000000" # protocol
+        CONTRACT_ARGS: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY 1000000000000 1000000000000" # protocol
         SUBSTRATE_URL: "ws://substrate-node:9944"
         SURI: //Alice
         ENDOWMENT: 2000000000000
