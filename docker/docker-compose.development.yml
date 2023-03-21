@@ -1,11 +1,12 @@
 version: '3.8'
 services:
   substrate:
-    image: prosopo/substrate:demo-v1.0.5
+    image: prosopo/substrate:dev-aura-aadbbed50ede27817158c7517f13f6f61c9cf000
     ports:
       - "9615:9615"
       - "9944:9944"
       - "9933:9933"
+      - "30333:30333"
     deploy:
       # replicas: 1
       resources:
