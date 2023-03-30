@@ -18,6 +18,7 @@ for repo in common ops protocol provider scripts contract procaptcha procaptcha-
 	  -f name="$label" \
 	 -f description="$desc" \
 	 -f color="$colour" \
-	 | echo
+	 | echo &
 done
 
+wait
