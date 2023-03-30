@@ -1,5 +1,7 @@
 #! /bin/bash
 
+# e.g. bash github/add_label.sh "contract" "issues involving the contract" "BDF876"
+
 set -u
 
 label="$1"
