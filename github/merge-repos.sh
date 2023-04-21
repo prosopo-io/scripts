@@ -3,24 +3,30 @@
 set -u
 
 repo="$1"
-dest="$d"
+dest="$2"
+subdir="$3"
 
-echo "" > msgs.txt
+msgs_txt="/tmp/msgs.txt"
+git_backup="/tmp/git_backup"
+
+echo "" > $msgs_txt
 
 # prefix all commit msgs with their originating repo name
-echo "regex:(.+)==>$repo: \1" > msgs.txt
+echo "regex:(.+)==>$repo: \1" > $msgs_txt
 
 cd "$repo"
 	# copy the .git dir to make a backup, as we're going to mutate the repo irreversibly
-	cp -r .git .git.orig
+	cp -r .git $git_backup
 	# get all remote branches
 	git fetch --all
-	branches=$(git branch -r | grep --invert-match " -> " | sed "s/.*\/\(.*\)/\1/")
+	branches=$( git branch -r | grep --invert-match " -> " | sed -r "s/[^\/]+\/(.*)/\1/")
 cd ..
 
 for branch in $branches; do
 	cd "$repo"
 		echo "$repo $branch"
+		git reset --hard
+		git clean -fxd
 		git checkout "$branch"
 		git pull
 		# rename the branch to include the repo name as prefix
@@ -44,14 +50,14 @@ cd ..
 
 # merge into dest repo
 # prefix all tags with their originating repo name (to avoid collisions also)
-git-filter-repo --source "$repo" --target "$dest" --path-rename :pkgs/$repo/ --tag-rename '':"$repo-" --replace-message msgs.txt --preserve-commit-hashes --force
+git-filter-repo --source "$repo" --target "$dest" --path-rename :$subdir/$repo/ --tag-rename '':"$repo-" --replace-message $msgs_txt --preserve-commit-hashes --force
 
 cd "$repo"
 	# reinstantiate the .git backup, dropping our changes
 	rm -rf .git
-	mv .git.orig .git
+	mv $git_backup .git
 cd ..
 
-rm msgs.txt
+rm $msgs_txt
 
-# run `git push -u --all origin` after to push all branches to remote
+# run `git push -u --all origin` and `git push --tags` after to push all branches + tags to remote
