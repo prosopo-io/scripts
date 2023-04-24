@@ -4,7 +4,7 @@ RUN git clone --depth 1 --branch polkadot-v0.9.40 https://github.com/paritytech/
 
 WORKDIR /builds/substrate
 
-RUN cargo build --verbose --locked --release
+RUN cargo +nightly build --verbose --locked
 
 FROM debian:bookworm-slim
 
@@ -15,7 +15,7 @@ RUN apt-get install -y procps
 
 RUN rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /builds/substrate/target/release/substrate /usr/local/bin
+COPY --from=builder /builds/substrate/target/debug/substrate /usr/local/bin
 
 EXPOSE 30333 9933 9944 9615
 
