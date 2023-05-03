@@ -3,14 +3,24 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
+interface Label {
+    id: number
+    node_id: string
+    url: string
+    name: string
+    color: string
+    default: boolean
+    description: string
+}
+
 class OctokitWrapper {
     private octokit: Octokit
-    constructor(private owner: string, private accessToken: string) {
+    constructor(private readonly owner: string, private accessToken: string) {
         this.octokit = new Octokit({ auth: accessToken })
         this.owner = owner
     }
 
-    public async getRepoLabels(repo: string) {
+    public async getRepoLabels(repo: string): Promise<Label[]> {
         const { data } = await this.octokit.request(`GET /repos/${this.owner}/${repo}/labels`, {
             owner: this.owner,
             repo,
@@ -24,18 +34,21 @@ class OctokitWrapper {
             try {
                 await this.delRepoLabel(newRepo, label.name)
             } catch (e) {
-                console.log(e)
+                console.warn(e.message)
             }
-            await this.setRepoLabel(newRepo, label.name, label.color)
+            await this.setRepoLabel(newRepo, label)
         }
     }
 
-    public async setRepoLabel(repo: string, label: string, color: string) {
+    public async setRepoLabel(repo: string, label: Label) {
+        console.log(label.color)
         const { data } = await this.octokit.request(`POST /repos/${this.owner}/${repo}/labels`, {
             owner: this.owner,
             repo,
-            name: label,
-            color,
+            name: label.name,
+            color: label.color,
+            description: label.description,
+            default: label.default,
         })
         return data
     }
@@ -58,16 +71,20 @@ function run() {
         throw new Error('No GITHUB_TOKEN env variable set')
     }
     const octokit = new OctokitWrapper('prosopo', process.env.GITHUB_TOKEN)
-    octokit
-        .copyRepoLabels('contract', 'captcha')
-        .then(() => {
-            console.log('done')
-            process.exit(0)
-        })
-        .catch((err) => {
-            console.error(err)
-            process.exit(1)
-        })
+    octokit.getRepoLabels('captcha').then((labels) => {
+        console.log(labels)
+        process.exit(0)
+    })
+    // octokit
+    //     .copyRepoLabels('contract', 'captcha')
+    //     .then(() => {
+    //         console.log('done')
+    //         process.exit(0)
+    //     })
+    //     .catch((err) => {
+    //         console.error(err)
+    //         process.exit(1)
+    //     })
 }
 
 run()
