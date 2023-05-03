@@ -8,7 +8,7 @@ label="$1"
 desc="$2"
 colour="$3" # without the leading "#"
 
-for repo in common ops protocol provider scripts contract procaptcha procaptcha-react workspaces datasets api demo-nft-marketplace client-example-server client-example dapp-example integration ; do
+for repo in common ops protocol provider scripts contract procaptcha procaptcha-react workspaces datasets api demo-nft-marketplace client-example-server client-example dapp-example integration captcha ; do
 	echo "$repo"
 	gh api \
 	  --method POST \
@@ -18,7 +18,7 @@ for repo in common ops protocol provider scripts contract procaptcha procaptcha-
 	  -f name="$label" \
 	 -f description="$desc" \
 	 -f color="$colour" \
-	 | echo &
+	 | cat &
 done
 
 wait
